@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolSafe — Sun Safety Timer: How Long Can I Stay in the Sun + SPF Calculator</title>
+<meta name="description" content="SolSafe tells you how long you can stay in the sun without sunscreen, recommends the right SPF with a what-SPF-do-I-need calculator, and runs a sunscreen reapply timer with swim/sweat alerts — free, unlimited, no signup.">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --sun: #FF8C42; --teal: #00A8B5; --sand: #FFF9E8; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: var(--sand); color: #3B2F2F; }
+  .font-display { font-family: 'Fredoka', 'Nunito', sans-serif; }
+  .wood {
+    background:
+      repeating-linear-gradient(93deg, rgba(0,0,0,.08) 0 2px, transparent 2px 26px),
+      linear-gradient(180deg, #7A5230 0%, #5E3D22 60%, #4E321B 100%);
+    border-bottom: 4px solid #3A2513;
+    box-shadow: 0 4px 0 rgba(0,0,0,.12);
+  }
+  .rope { border: 3px dashed rgba(255,249,232,.55); }
+  .sign-board {
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 3px, transparent 3px 34px),
+      linear-gradient(180deg, #A9743F 0%, #8A5A2E 100%);
+    border: 6px solid #4E321B;
+    box-shadow: 0 10px 24px rgba(78,50,27,.35), inset 0 2px 0 rgba(255,255,255,.25);
+  }
+  .pennant { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 24px solid var(--sun); }
+  .pennant.teal { border-top-color: var(--teal); }
+  .pennant.cream { border-top-color: #FFE3B3; }
+  .kiosk-card {
+    background: #FFFDF6;
+    border: 3px solid #4E321B;
+    border-radius: 18px;
+    box-shadow: 0 6px 0 rgba(78,50,27,.9), 0 14px 30px rgba(78,50,27,.18);
+  }
+  .booth-label {
+    background: var(--sun); color: #fff;
+    border: 3px solid #4E321B;
+    box-shadow: 0 3px 0 rgba(78,50,27,.9);
+  }
+  .quiz-opt {
+    border: 2px solid #E8DCC3; border-radius: 14px; background: #FFFEF9;
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+  .quiz-opt:hover { transform: translateY(-2px); border-color: var(--sun); box-shadow: 0 6px 14px rgba(255,140,66,.25); }
+  .type-tile { border: 3px solid #E8DCC3; border-radius: 14px; cursor: pointer; transition: all .12s ease; }
+  .type-tile:hover { transform: translateY(-2px); }
+  .type-tile.selected { border-color: var(--sun); background: #FFF1E2; box-shadow: 0 0 0 3px rgba(255,140,66,.3); }
+  input[type="range"] { accent-color: var(--sun); }
+  .timer-digits { font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+  .alert-flash { animation: alertFlash 1s steps(2, jump-none) infinite; }
+  @keyframes alertFlash {
+    0%, 100% { background: #DC2626; color: #fff; }
+    50% { background: #FFF; color: #DC2626; }
+  }
+  .flag-banner { border-left: 10px solid; border-radius: 12px; }
+  details.faq { border: 2px solid #E8DCC3; border-radius: 12px; background: #FFFEF9; }
+  details.faq summary { cursor: pointer; }
+  details.faq[open] { border-color: var(--teal); }
+  .wave-sep { height: 18px; background: repeating-linear-gradient(-45deg, var(--teal) 0 14px, transparent 14px 28px); opacity: .35; }
+  .sun-rays { animation: spinSlow 24s linear infinite; }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+  .toggle-dot { transition: transform .15s ease; }
+</style>
+</head>
+<body id="top">
+
+<!-- ============ STICKY HEADER: boardwalk sign ============ -->
+<header class="wood sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5">
+      <svg class="sun-rays" width="34" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <circle cx="20" cy="20" r="8" fill="#FFD93D" stroke="#4E321B" stroke-width="2.5"/>
+        <g stroke="#FFD93D" stroke-width="3" stroke-linecap="round">
+          <line x1="20" y1="4" x2="20" y2="9"/><line x1="20" y1="31" x2="20" y2="36"/>
+          <line x1="4" y1="20" x2="9" y2="20"/><line x1="31" y1="20" x2="36" y2="20"/>
+          <line x1="8.7" y1="8.7" x2="12.2" y2="12.2"/><line x1="27.8" y1="27.8" x2="31.3" y2="31.3"/>
+          <line x1="31.3" y1="8.7" x2="27.8" y2="12.2"/><line x1="12.2" y1="27.8" x2="8.7" y2="31.3"/>
+        </g>
+      </svg>
+      <span class="font-display text-2xl font-bold text-[#FFF9E8] tracking-wide" style="text-shadow: 2px 2px 0 #3A2513;">SolSafe</span>
+    </a>
+    <nav class="flex items-center gap-2 sm:gap-5">
+      <a href="#top" class="font-display text-[#FFF9E8] hover:text-[#FFD93D] font-semibold text-sm sm:text-base">Home</a>
+      <a href="https://fixoraa.tech" class="rope font-display text-[#FFF9E8] hover:text-[#FFD93D] font-semibold text-sm sm:text-base px-3 py-1 rounded-full">More Tools</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ TOP AD (verbatim) ============ -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HERO: big boardwalk sign ============ -->
+<main class="max-w-6xl mx-auto px-4 sm:px-6">
+  <div class="sign-board rounded-3xl mt-6 px-6 py-10 sm:py-14 text-center relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none opacity-20" style="background: radial-gradient(circle at 20% 20%, #FFD93D 0 60px, transparent 61px), radial-gradient(circle at 85% 75%, #00A8B5 0 80px, transparent 81px);"></div>
+    <span class="booth-label font-display inline-block px-4 py-1.5 rounded-full text-sm font-semibold tracking-widest uppercase mb-4">🏖️ Lifeguard Sun Kiosk</span>
+    <h1 class="font-display text-4xl sm:text-6xl font-bold text-[#FFF9E8] leading-tight" style="text-shadow: 3px 3px 0 #3A2513;">SolSafe<br><span class="text-[#FFD93D]">Sun Safety Timer</span></h1>
+    <p class="mt-4 text-[#FFF9E8]/95 text-lg sm:text-xl font-semibold max-w-2xl mx-auto">Know exactly how long you can stay in the sun, which SPF you actually need, and never miss a reapply again.</p>
+    <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+      <span class="inline-flex items-center gap-2 bg-[#00A8B5] text-white font-display font-semibold px-5 py-2.5 rounded-full border-[3px] border-[#4E321B] shadow-[0_3px_0_rgba(78,50,27,.9)]">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1l2.4 5.2L18 7.3l-4 4 1 5.7-5-2.8-5 2.8 1-5.7-4-4 5.6-1.1L10 1z" fill="#FFD93D" stroke="#4E321B" stroke-width="1.5"/></svg>
+        Unlimited Free Usage
+      </span>
+      <span class="text-[#FFF9E8]/85 font-semibold text-sm">No signup · No paywall · No watermark</span>
+    </div>
+  </div>
+
+  <!-- pennant divider -->
+  <div class="flex justify-center gap-2 mt-8 mb-2" aria-hidden="true" id="pennants"></div>
+
+  <!-- ============ TOOL BOOTHS ============ -->
+  <section aria-label="Sun safety tools" class="mt-4 space-y-10">
+
+    <!-- BOOTH 1: SKIN TYPE QUIZ -->
+    <div class="kiosk-card p-5 sm:p-8">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="booth-label font-display px-3 py-1 rounded-lg text-sm font-semibold">BOOTH 1</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Find Your Skin Type</h2>
+      </div>
+      <p class="text-[#6B5B4F] font-semibold mb-5">Answer 5 quick questions — no boring dropdown. SolSafe figures out your Fitzpatrick skin type (I–VI) from real descriptions.</p>
+
+      <div id="quiz-start" class="text-center py-4">
+        <button id="quiz-begin" class="font-display bg-[#FF8C42] hover:bg-[#f07f36] text-white text-lg font-semibold px-8 py-3.5 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)] transition-transform hover:-translate-y-0.5">Start the Skin Quiz →</button>
+        <p class="mt-3 text-sm text-[#6B5B4F]">…or tap a type directly:</p>
+        <div id="type-tiles" class="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mt-3"></div>
+      </div>
+
+      <div id="quiz-body" class="hidden">
+        <div class="flex items-center justify-between mb-4">
+          <div id="quiz-dots" class="flex gap-1.5"></div>
+          <span id="quiz-count" class="font-display font-semibold text-[#6B5B4F]"></span>
+        </div>
+        <h3 id="quiz-q" class="font-display text-xl sm:text-2xl font-semibold mb-4"></h3>
+        <div id="quiz-opts" class="space-y-2.5"></div>
+        <div class="mt-5 flex justify-between">
+          <button id="quiz-back" class="font-display font-semibold text-[#6B5B4F] hover:text-[#FF8C42] px-4 py-2">← Back</button>
+          <button id="quiz-restart" class="font-display font-semibold text-[#6B5B4F] hover:text-[#FF8C42] px-4 py-2">Restart quiz</button>
+        </div>
+      </div>
+
+      <div id="quiz-result" class="hidden mt-2">
+        <div class="rounded-2xl p-5 sm:p-6 border-[3px] border-[#4E321B]" style="background: linear-gradient(135deg, #FFF1E2, #FFE3B3);">
+          <p class="font-display text-sm uppercase tracking-widest text-[#a05a1e] font-semibold">Your skin type</p>
+          <h3 id="quiz-result-name" class="font-display text-3xl font-bold mt-1"></h3>
+          <p id="quiz-result-desc" class="mt-2 font-semibold text-[#6B5B4F]"></p>
+          <p id="quiz-result-base" class="mt-1 text-sm font-bold text-[#a05a1e]"></p>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button id="quiz-use" class="font-display bg-[#00A8B5] hover:bg-[#0096a3] text-white font-semibold px-6 py-2.5 rounded-xl border-[3px] border-[#4E321B] shadow-[0_3px_0_rgba(78,50,27,.9)]">Use This Skin Type ✓</button>
+            <button id="quiz-retake" class="font-display font-semibold px-6 py-2.5 rounded-xl border-[3px] border-[#4E321B] bg-white hover:bg-[#FFF9E8]">Retake</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOTH 2: SUN EXPOSURE CALCULATOR -->
+    <div class="kiosk-card p-5 sm:p-8">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="booth-label font-display px-3 py-1 rounded-lg text-sm font-semibold">BOOTH 2</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Sun Exposure Calculator</h2>
+      </div>
+      <p class="text-[#6B5B4F] font-semibold mb-5">Set your skin type, the UV index, and the SPF you're wearing — SolSafe shows your safe minutes before burning.</p>
+
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="space-y-5">
+          <div>
+            <div class="flex justify-between items-baseline mb-1">
+              <label class="font-display font-semibold">Skin type</label>
+              <span id="calc-skin-label" class="font-bold text-[#FF8C42]">Type III — Medium</span>
+            </div>
+            <input id="calc-skin" type="range" min="1" max="6" step="1" value="3" class="w-full" aria-label="Skin type">
+            <div class="flex justify-between text-xs font-bold text-[#6B5B4F]"><span>I</span><span>II</span><span>III</span><span>IV</span><span>V</span><span>VI</span></div>
+          </div>
+          <div>
+            <div class="flex justify-between items-baseline mb-1">
+              <label class="font-display font-semibold">UV index right now</label>
+              <span class="font-bold text-[#FF8C42]">UV <span id="calc-uv-val">6</span></span>
+            </div>
+            <input id="calc-uv" type="range" min="0" max="12" step="0.5" value="6" class="w-full" aria-label="UV index">
+            <p class="text-xs text-[#6B5B4F] font-semibold">Find it in your weather app, or on a UV meter. When in doubt, guess higher.</p>
+          </div>
+          <div>
+            <div class="flex justify-between items-baseline mb-1">
+              <label class="font-display font-semibold">SPF on your skin</label>
+              <span class="font-bold text-[#FF8C42]">SPF <span id="calc-spf-val">30</span></span>
+            </div>
+            <input id="calc-spf" type="range" min="0" max="100" step="5" value="30" class="w-full" aria-label="SPF applied">
+            <p class="text-xs text-[#6B5B4F] font-semibold">Set 0 if you're wearing nothing — SolSafe will show your unprotected time.</p>
+          </div>
+          <label class="flex items-center gap-3 cursor-pointer select-none bg-[#EAFBFC] border-2 border-[#00A8B5] rounded-xl px-4 py-3">
+            <span class="relative inline-block w-12 h-7 shrink-0">
+              <input id="kids-toggle" type="checkbox" class="sr-only" aria-label="Kids mode">
+              <span class="absolute inset-0 rounded-full bg-[#cfe3e5]"></span>
+              <span id="kids-dot" class="toggle-dot absolute top-1 left-1 w-5 h-5 rounded-full bg-[#00A8B5]"></span>
+            </span>
+            <span class="font-display font-semibold">🧒 Kids mode <span class="text-sm font-normal text-[#6B5B4F]">— child-skin defaults + shade alerts</span></span>
+          </label>
+        </div>
+
+        <div>
+          <div id="calc-result" class="rounded-2xl p-5 border-[3px] border-[#4E321B] text-center" style="background: linear-gradient(135deg, #FFF9E8, #FFEFC9);">
+            <p class="font-display text-sm uppercase tracking-widest text-[#a05a1e] font-semibold">Safe time before burning</p>
+            <p class="font-display font-bold leading-none mt-1" style="font-size: 4rem; color: #FF8C42;"><span id="calc-minutes">90</span><span class="text-2xl"> min</span></p>
+            <p id="calc-sub" class="font-semibold text-[#6B5B4F] mt-1"></p>
+            <p class="mt-3 font-display font-semibold">⏰ Reapply sunscreen every <span id="calc-reapply" class="text-[#00A8B5] text-xl font-bold">45</span> min</p>
+            <button id="calc-to-timer" class="mt-4 font-display bg-[#FF8C42] hover:bg-[#f07f36] text-white font-semibold px-6 py-2.5 rounded-xl border-[3px] border-[#4E321B] shadow-[0_3px_0_rgba(78,50,27,.9)]">Send to Reapply Timer ↓</button>
+          </div>
+          <div id="uv-flag" class="flag-banner mt-4 px-4 py-3 bg-white border-y-[3px] border-r-[3px] border-[#4E321B]">
+            <p class="font-display font-bold"><span id="uv-flag-label"></span> <span id="uv-flag-band" class="ml-1 px-2 py-0.5 rounded-full text-white text-sm"></span></p>
+            <p id="uv-flag-advice" class="text-sm font-semibold text-[#6B5B4F] mt-1"></p>
+          </div>
+          <div id="kids-alert" class="hidden mt-3 rounded-xl px-4 py-3 bg-[#FFF3F3] border-[3px] border-[#DC2626]">
+            <p class="font-display font-bold text-[#DC2626]">🧒 Kids shade alert</p>
+            <p id="kids-alert-text" class="text-sm font-semibold text-[#6B5B4F] mt-1"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOTH 3: REVERSE SPF FINDER -->
+    <div class="kiosk-card p-5 sm:p-8">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="booth-label font-display px-3 py-1 rounded-lg text-sm font-semibold">BOOTH 3</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Reverse SPF Finder</h2>
+      </div>
+      <p class="text-[#6B5B4F] font-semibold mb-5">Tell SolSafe how long you plan to stay in the sun — it works backwards from your skin type and the UV index to recommend the SPF you need.</p>
+      <div class="grid sm:grid-cols-2 gap-6 items-center">
+        <div class="space-y-4">
+          <div>
+            <label class="font-display font-semibold block mb-1" for="spf-planned">Planned time in the sun (minutes)</label>
+            <input id="spf-planned" type="number" min="1" max="720" value="120" class="w-full px-4 py-3 rounded-xl border-[3px] border-[#4E321B] bg-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-[#FF8C42]">
+          </div>
+          <p class="text-sm font-semibold text-[#6B5B4F]">Uses your current skin type (<span id="spf-skin-label" class="font-bold text-[#FF8C42]">Type III — Medium</span>) and UV <span id="spf-uv-label" class="font-bold text-[#FF8C42]">6</span> from Booth 2.</p>
+          <button id="spf-find" class="font-display bg-[#00A8B5] hover:bg-[#0096a3] text-white text-lg font-semibold px-8 py-3 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)] transition-transform hover:-translate-y-0.5">What SPF Do I Need? →</button>
+          <p id="spf-error" class="hidden text-sm font-bold text-[#DC2626]"></p>
+        </div>
+        <div id="spf-result" class="hidden rounded-2xl p-6 border-[3px] border-[#4E321B] text-center" style="background: linear-gradient(135deg, #EAFBFC, #D3F3F5);">
+          <p class="font-display text-sm uppercase tracking-widest text-[#0b7d86] font-semibold">Recommended</p>
+          <p class="font-display font-bold leading-none mt-1" style="font-size: 4.5rem; color: #00A8B5;">SPF <span id="spf-rec">30</span></p>
+          <p id="spf-msg" class="mt-2 font-semibold text-[#3B2F2F]"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOTH 4: LIVE REAPPLY TIMER -->
+    <div class="kiosk-card p-5 sm:p-8">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="booth-label font-display px-3 py-1 rounded-lg text-sm font-semibold">BOOTH 4</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Live Sunscreen Reapply Timer</h2>
+      </div>
+      <p class="text-[#6B5B4F] font-semibold mb-5">Start the countdown and SolSafe will sound an audible alert — plus a flashing banner — the moment it's time to reapply. Went swimming or started sweating? Hit the reset button.</p>
+
+      <div id="timer-expired-banner" class="hidden alert-flash rounded-2xl border-[3px] border-[#4E321B] px-6 py-4 text-center mb-5">
+        <p class="font-display text-2xl font-bold">⏰ TIME'S UP — REAPPLY YOUR SUNSCREEN! ⏰</p>
+        <p class="font-semibold">Your protection window just ended. Reapply now, then restart the timer.</p>
+      </div>
+
+      <div class="text-center">
+        <p id="timer-digits" class="font-display timer-digits font-bold" style="font-size: clamp(3.5rem, 12vw, 6rem); color: #3B2F2F;">45:00</p>
+        <div class="max-w-md mx-auto h-4 rounded-full bg-[#EFE3C8] border-2 border-[#4E321B] overflow-hidden mt-2">
+          <div id="timer-bar" class="h-full rounded-full" style="width: 0%; background: linear-gradient(90deg, #00A8B5, #FF8C42); transition: width .5s linear;"></div>
+        </div>
+        <p id="timer-status" class="mt-2 font-display font-semibold text-[#6B5B4F]">Ready — pick a duration below, then press Start.</p>
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-2.5">
+        <button data-timer-min="20" class="timer-preset font-display font-semibold px-4 py-2 rounded-xl border-2 border-[#4E321B] bg-white hover:bg-[#FFF1E2]">20 min</button>
+        <button data-timer-min="40" class="timer-preset font-display font-semibold px-4 py-2 rounded-xl border-2 border-[#4E321B] bg-white hover:bg-[#FFF1E2]">40 min</button>
+        <button data-timer-min="60" class="timer-preset font-display font-semibold px-4 py-2 rounded-xl border-2 border-[#4E321B] bg-white hover:bg-[#FFF1E2]">60 min</button>
+        <button data-timer-min="90" class="timer-preset font-display font-semibold px-4 py-2 rounded-xl border-2 border-[#4E321B] bg-white hover:bg-[#FFF1E2]">90 min</button>
+        <button data-timer-min="120" class="timer-preset font-display font-semibold px-4 py-2 rounded-xl border-2 border-[#4E321B] bg-white hover:bg-[#FFF1E2]">2 hrs</button>
+        <span class="inline-flex items-center gap-2">
+          <input id="timer-custom" type="number" min="1" max="480" placeholder="Custom" class="w-24 px-3 py-2 rounded-xl border-2 border-[#4E321B] bg-white font-bold text-center" aria-label="Custom minutes">
+          <span class="font-semibold text-sm text-[#6B5B4F]">min</span>
+        </span>
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <button id="timer-start" class="font-display bg-[#16A34A] hover:bg-[#149a45] text-white text-lg font-semibold px-8 py-3 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)]">▶ Start</button>
+        <button id="timer-pause" class="font-display bg-[#D9A400] hover:bg-[#c99800] text-white text-lg font-semibold px-8 py-3 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)]" disabled>⏸ Pause</button>
+        <button id="timer-reset" class="font-display bg-white hover:bg-[#FFF9E8] text-lg font-semibold px-8 py-3 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)]">↺ Reset</button>
+      </div>
+      <div class="mt-4 text-center">
+        <button id="timer-swim" class="font-display bg-[#00A8B5] hover:bg-[#0096a3] text-white font-semibold px-6 py-3 rounded-2xl border-[3px] border-[#4E321B] shadow-[0_4px_0_rgba(78,50,27,.9)]">🏊 Went swimming / sweating — restart protection clock</button>
+        <p class="mt-2 text-sm font-semibold text-[#6B5B4F]">Water and sweat cut sunscreen short. This button restarts your countdown from a fresh full interval.</p>
+      </div>
+    </div>
+
+    <!-- BOOTH 5: KIDS MODE INFO -->
+    <div class="kiosk-card p-5 sm:p-8" style="border-color: #00A8B5;">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="font-display px-3 py-1 rounded-lg text-sm font-semibold text-white" style="background:#00A8B5; border: 3px solid #4E321B; box-shadow: 0 3px 0 rgba(78,50,27,.9);">BOOTH 5</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-bold">Kids Mode, Explained</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-5 text-[#3B2F2F]">
+        <ul class="space-y-2.5 font-semibold">
+          <li>🧒 <strong>Child-skin defaults:</strong> SolSafe treats kids' skin like sensitive Type II and recommends <strong>SPF 50+</strong> automatically.</li>
+          <li>⏱️ <strong>Shorter reapply clock:</strong> kids' countdowns are capped at <strong>60 minutes</strong> and default to <strong>40 minutes</strong>.</li>
+          <li>🚩 <strong>Shade-seeking alerts by UV band:</strong> flip Kids Mode on and every UV band shows a kid-specific shade rule.</li>
+        </ul>
+        <ul class="space-y-2.5 font-semibold">
+          <li>☂️ <strong>UV 6+:</strong> kids play in shade between 11am–3pm.</li>
+          <li>🔴 <strong>UV 8+:</strong> mostly shade + hat + long sleeves.</li>
+          <li>🟣 <strong>UV 11+:</strong> keep kids indoors or fully shaded at midday.</li>
+          <li>💧 <strong>After every swim:</strong> reapply immediately — "water-resistant" is not "waterproof".</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ BOTTOM AD (verbatim) ============ -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEO ARTICLE ============ -->
+<article class="max-w-4xl mx-auto px-4 sm:px-6 pb-10 text-[#3B2F2F]">
+  <div class="wave-sep rounded-full mb-8"></div>
+  <h2 class="font-display text-3xl sm:text-4xl font-bold mb-6">The Complete Guide to Sun Safety: Burn Times, SPF &amp; Reapply Timers</h2>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">How Long Can I Stay in the Sun Without Sunscreen?</h3>
+  <p class="mb-4 leading-relaxed">It is the question every beachgoer asks, and the honest answer is: it depends on your skin, the UV index, and the time of day. Dermatologists use the Fitzpatrick scale — six skin types from Type I (very fair, always burns) to Type VI (deeply pigmented, never burns) — to estimate it. As a conservative rule of thumb, unprotected skin at a moderate UV index of 3 starts to burn after roughly 10 minutes for Type I, 20 minutes for Type II, 30 minutes for Type III, 40 minutes for Type IV, 50 minutes for Type V, and 60 minutes for Type VI. These are the exact base numbers SolSafe uses, and they are deliberately cautious: redness can begin before you feel any pain, and by the time your skin stings, the damage is already done. So if you have been Googling "how long can I stay in the sun without sunscreen," the calculator at the top of this page turns that rule of thumb into a personal number — pick your skin type from the quiz, dial in the UV index from your weather app, set SPF to 0, and read your unprotected burn time. For most fair-skinned people at midday in summer, the answer is sobering: often under 20 minutes.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">The Fitzpatrick Skin Type System, Explained</h3>
+  <p class="mb-4 leading-relaxed">The Fitzpatrick scale was developed in 1975 by dermatologist Thomas Fitzpatrick to predict how skin responds to ultraviolet light. Type I describes very pale skin with red or blond hair and light eyes — it always burns and never tans. Type II is fair skin that usually burns and tans minimally. Type III is medium skin that sometimes burns mildly and then tans gradually. Type IV is olive skin that rarely burns and tans easily. Type V is brown skin that very rarely burns and tans dark. Type VI is deeply pigmented skin that never burns. Knowing your type matters far beyond curiosity: it is the single biggest input to every sun-safety calculation, from how fast you burn to which SPF makes sense. That is why SolSafe starts with an interactive quiz instead of a bare dropdown — five description-based questions about your untanned skin tone, your burn history, your hair and eye color, your freckles, and your worst sunburn ever, which together place you on the scale far more reliably than guessing from a list.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">UV Index: Your Daily Burn-Speed Dial</h3>
+  <p class="mb-4 leading-relaxed">The UV index measures how strong the sun's burning rays are at a given place and time, on a scale that typically runs from 0 (night) to 11+ (extreme). The crucial thing to understand is that burn speed scales almost linearly with it: skin burns roughly twice as fast at UV 6 as at UV 3, and roughly three times as fast at UV 9. SolSafe's math is transparent about this — safe minutes equal your base burn time, multiplied by your SPF, multiplied by 3 divided by the UV index. So a Type III person (30 base minutes) wearing SPF 30 at UV 6 gets 30 × 30 × (3/6) = 450 minutes of theoretical protection, while the same person at UV 9 with no sunscreen gets just 30 × (3/9) = 10 minutes. Check the UV index in your phone's weather app before you head out; it changes with cloud cover, altitude, and even reflective surfaces like sand, water, and snow, which can bounce extra UV onto your skin. The flag-style banners in the calculator show the standard five bands — Low, Moderate, High, Very High, and Extreme — each with its own protection advice.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">What SPF Do I Need? A Calculator, Not a Guess</h3>
+  <p class="mb-4 leading-relaxed">Walk into any pharmacy and you will face a wall of numbers: 15, 30, 50, 100. Higher is not automatically better, and lower is not automatically enough — what matters is matching the SPF to your skin, the UV, and how long you will be out. That is exactly what a what SPF do I need calculator does, and it is the logic behind Booth 3 above. The formula works backwards from your planned exposure: required SPF equals your planned minutes, times the UV speed factor, divided by your base burn minutes, plus a 20% safety margin. Then SolSafe rounds up to the nearest common SPF — 15, 30, 50, or 100. A quick reality check on what SPF numbers actually mean: SPF 15 blocks about 93% of UVB rays, SPF 30 about 97%, SPF 50 about 98%, and SPF 100 about 99%. No sunscreen blocks 100%, which is why dermatologists emphasize that reapplication and shade matter more than chasing the biggest number on the bottle. If the calculator ever recommends SPF 100 and still flags your plan as too long, take the hint — add a hat, a rash guard, or a shady spot to the plan.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">Why a Sunscreen Reapply Timer Beats Your Memory</h3>
+  <p class="mb-4 leading-relaxed">Here is the uncomfortable truth about sunscreen: the SPF number on the bottle assumes a perfect, even, thick layer applied in a lab — and almost nobody applies it that way. Most people use a quarter to half the tested amount, miss spots like ears and the tops of feet, and then forget the clock entirely. Sunscreen also degrades: UV breaks down its active ingredients, and normal activity rubs it off. That is why every major dermatology body says the same thing — reapply every two hours, and immediately after swimming or heavy sweating. A sunscreen reapply timer like SolSafe's Booth 4 turns that advice into something you will actually follow: it counts down your personal protection window (set from your real skin type, UV, and SPF), then fires an audible beep and a flashing banner the moment your coverage lapses. Conservative timers like this one ring at roughly a quarter of your theoretical burn time, capped at two hours, because the goal is never to find out exactly when you would burn — it is to stay comfortably inside the safe zone.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">The Swim and Sweat Problem</h3>
+  <p class="mb-4 leading-relaxed">"Water-resistant" is one of the most misunderstood words in sun care. In the US and EU, it means the sunscreen kept its labeled SPF after 40 minutes (or 80 for "very water-resistant") of water immersion in lab conditions — it emphatically does not mean waterproof, and no regulator allows that word on a label. Towel-drying, rubbing, and sweating strip sunscreen even faster than a calm swim. The practical rule is simple: every swim, every heavy sweat, every towel-off resets your protection clock to zero, and you should reapply immediately. SolSafe's swim/sweat button exists for exactly this moment — one tap restarts your countdown from a fresh full interval, so a dip in the ocean does not silently turn the rest of your afternoon into unprotected time. If you are choosing a product for beach days, a water-resistant SPF 50+ applied generously is the right starting point, but the reapply habit is what actually protects you.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">Kids and Sun: The Rules Are Stricter</h3>
+  <p class="mb-4 leading-relaxed">Children's skin is thinner, more sensitive, and more vulnerable to long-term damage — and sunburns in childhood measurably raise skin-cancer risk later in life. Pediatric guidance is consistent: babies under six months should be kept out of direct sun entirely, and older children need SPF 50+ broad-spectrum sunscreen, protective clothing, hats, and regular shade. SolSafe's Kids Mode bakes this in: it defaults to sensitive-skin math (treated like Type II), recommends SPF 50+, caps reapply countdowns at 60 minutes with a 40-minute default, and — most usefully — shows shade-seeking alerts matched to each UV band. At UV 6 and above, the guidance is clear: kids play in the shade between 11am and 3pm. At UV 8+, add hats and long sleeves and keep them mostly shaded. At UV 11+, keep midday play indoors or fully shaded. Think of shade as the primary sunscreen for kids, with SPF 50+ as the backup layer.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">The Mistakes Almost Everyone Makes</h3>
+  <p class="mb-4 leading-relaxed">First, under-application: the tested dose is about a shot glass (30 ml) for a full adult body, or two finger-lengths of cream just for the face — most people apply far less, which can cut the effective SPF to a third of the label. Second, the "base tan" myth: a tan is visible DNA damage, and it provides roughly SPF 3 of protection — essentially nothing. Third, skipping cloudy days: up to 80% of UV passes through cloud cover, and you can burn badly under an overcast sky. Fourth, forgetting that UV peaks between roughly 10am and 4pm, when the same outing is dramatically more burning than morning or late afternoon. Fifth, ignoring lips, ears, scalps, and the tops of feet. And sixth — the big one — applying once in the morning and assuming you are covered all day. Sunscreen is a consumable shield, not a force field; the timer exists because human memory is the weakest link in the whole system.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">How SolSafe Computes Your Numbers</h3>
+  <p class="mb-4 leading-relaxed">Transparency matters when a tool gives health-adjacent advice, so here is the full recipe. Each Fitzpatrick type gets a base burn time at UV 3 with no sunscreen: Type I 10 minutes, Type II 20, Type III 30, Type IV 40, Type V 50, Type VI 60. Your protected time is base × SPF × (3 ÷ UV index). Your reapply interval is one quarter of that protected time, clamped between 20 and 120 minutes (20 to 60 in Kids Mode). The reverse SPF finder divides your planned minutes by the same formula, adds a 20% safety margin, and rounds up to 15, 30, 50, or 100. These are conservative, rule-of-thumb estimates — not medical advice, and not a substitute for a dermatologist. Individual factors like medications (some antibiotics and acne treatments cause photosensitivity), altitude, reflection off water and sand, and how thickly you actually applied the sunscreen all shift the real numbers. When in doubt, choose the safer option: more shade, more sunscreen, more often.</p>
+
+  <h3 class="font-display text-2xl font-bold mt-8 mb-3">When to Seek Shade, Whatever the Numbers Say</h3>
+  <p class="mb-4 leading-relaxed">Calculators are useful, but the oldest sun-safety technology is still the best: get out of the sun. The shadow rule is a handy field test — if your shadow is shorter than you are, the UV is strong and you should be seeking shade. Plan outdoor exercise, runs, and long walks for early morning or late afternoon. Carry a hat with a real brim, not just a cap, because ears and necks burn. Remember that shade from a single beach umbrella still lets scattered and reflected UV through, so combine shade with sunscreen rather than treating it as a replacement. And keep an eye on the people around you: kids, elderly relatives, and fair-skinned friends hit their limits long before you might. Set the SolSafe timer, enjoy the sun in sensible doses, and let the lifeguard kiosk do the worrying for you.</p>
+
+  <!-- ============ FAQs ============ -->
+  <h2 class="font-display text-3xl font-bold mt-12 mb-6">Frequently Asked Questions</h2>
+  <div class="space-y-3" id="faqs">
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">How long can I stay in the sun without sunscreen?</summary>
+      <p class="mt-2 leading-relaxed">It depends on your Fitzpatrick skin type and the UV index. As a conservative rule of thumb at UV 3, unprotected skin starts to burn after about 10 minutes (Type I), 20 minutes (Type II), 30 minutes (Type III), 40 minutes (Type IV), 50 minutes (Type V), or 60 minutes (Type VI) — and burn time shrinks as the UV index rises. Use the calculator above with SPF set to 0 for your personal number.</p>
+    </details>
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">What SPF do I need for a day at the beach?</summary>
+      <p class="mt-2 leading-relaxed">Match the SPF to your skin type, the UV index, and your planned time in the sun. The reverse SPF finder above does this math: it divides your planned minutes by your personal burn time, adds a 20% safety margin, and recommends 15, 30, 50, or 100. For most beach days at high UV, SPF 30–50 applied generously and reapplied every two hours is the dermatologist-backed baseline.</p>
+    </details>
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">How often should I reapply sunscreen?</summary>
+      <p class="mt-2 leading-relaxed">Every two hours at most, and immediately after swimming, heavy sweating, or towel-drying. SolSafe's sunscreen reapply timer is more conservative: it rings at roughly a quarter of your theoretical protected burn time (capped at two hours, or 60 minutes in Kids Mode), because the goal is to stay well inside the safe zone, not to find its edge.</p>
+    </details>
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">Does "water-resistant" sunscreen survive swimming?</summary>
+      <p class="mt-2 leading-relaxed">No — "water-resistant" means the SPF held up after 40 minutes (or 80 for "very water-resistant") of lab water immersion, and no sunscreen is waterproof. Towel-drying removes even more. Treat every swim, heavy sweat, or towel-off as resetting your protection to zero and reapply right away; the swim/sweat button on the timer above restarts your countdown for exactly this reason.</p>
+    </details>
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">Can I get sunburned on a cloudy day?</summary>
+      <p class="mt-2 leading-relaxed">Yes — up to 80% of UV radiation passes through clouds, and cool air makes it easy to stay out longer without noticing. Check the UV index in your weather app rather than trusting the sky: a UV 6 overcast day burns you almost as fast as a UV 6 sunny day. Sand, water, and snow also reflect UV onto skin that feels shaded.</p>
+    </details>
+    <details class="faq p-4">
+      <summary class="font-display font-semibold text-lg">Do children need stronger sunscreen than adults?</summary>
+      <p class="mt-2 leading-relaxed">Yes. Pediatric guidance recommends SPF 50+ broad-spectrum sunscreen for children, plus hats, protective clothing, and regular shade — babies under six months should avoid direct sun entirely. SolSafe's Kids Mode applies child-skin defaults automatically: sensitive-skin math, SPF 50+, reapply countdowns capped at 60 minutes, and shade-seeking alerts matched to each UV band.</p>
+    </details>
+  </div>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long can I stay in the sun without sunscreen?",
+        "acceptedAnswer": { "@type": "Answer", "text": "It depends on your Fitzpatrick skin type and the UV index. As a conservative rule of thumb at UV 3, unprotected skin starts to burn after about 10 minutes (Type I), 20 minutes (Type II), 30 minutes (Type III), 40 minutes (Type IV), 50 minutes (Type V), or 60 minutes (Type VI) — and burn time shrinks as the UV index rises." }
+      },
+      {
+        "@type": "Question",
+        "name": "What SPF do I need for a day at the beach?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Match the SPF to your skin type, the UV index, and your planned time in the sun. SolSafe's reverse SPF finder divides your planned minutes by your personal burn time, adds a 20% safety margin, and recommends 15, 30, 50, or 100. For most beach days at high UV, SPF 30–50 applied generously and reapplied every two hours is the dermatologist-backed baseline." }
+      },
+      {
+        "@type": "Question",
+        "name": "How often should I reapply sunscreen?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Every two hours at most, and immediately after swimming, heavy sweating, or towel-drying. SolSafe's sunscreen reapply timer rings at roughly a quarter of your theoretical protected burn time (capped at two hours, or 60 minutes in Kids Mode), because the goal is to stay well inside the safe zone." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does \"water-resistant\" sunscreen survive swimming?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No — water-resistant means the SPF held up after 40 minutes (or 80 for very water-resistant) of lab water immersion, and no sunscreen is waterproof. Treat every swim, heavy sweat, or towel-off as resetting your protection to zero and reapply right away." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I get sunburned on a cloudy day?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — up to 80% of UV radiation passes through clouds. Check the UV index in your weather app rather than trusting the sky: a UV 6 overcast day burns you almost as fast as a UV 6 sunny day." }
+      },
+      {
+        "@type": "Question",
+        "name": "Do children need stronger sunscreen than adults?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Pediatric guidance recommends SPF 50+ broad-spectrum sunscreen for children, plus hats, protective clothing, and regular shade — babies under six months should avoid direct sun entirely. SolSafe's Kids Mode applies child-skin defaults: sensitive-skin math, SPF 50+, reapply countdowns capped at 60 minutes, and shade-seeking alerts matched to each UV band." }
+      }
+    ]
+  }
+  </script>
+</article>
+
+<footer class="wood mt-4">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-center">
+    <p class="font-display text-[#FFF9E8] font-semibold text-lg">SolSafe — your lifeguard for sun safety</p>
+    <p class="text-[#FFF9E8]/70 text-sm mt-1 max-w-2xl mx-auto">Burn-time estimates are conservative rules of thumb for education, not medical advice. Medications, altitude, and application thickness change real-world results — when in doubt, seek shade and ask a dermatologist.</p>
+    <p class="text-[#FFF9E8]/50 text-xs mt-2">Free forever · No signup · No watermark</p>
+  </div>
+</footer>
+
+<!-- ============ LIB (inlined at build time) ============ -->
+<script id="solsafe-sun-timer-lib">
+/* SolSafe sun-timer logic — pure functions, no DOM.
+ * Shipped inside <script id="solsafe-sun-timer-lib"> in solsafe-sun-timer.html.
+ * Tests eval this exact block from the finished HTML.
+ *
+ * Model (transparent, conservative rule-of-thumb math):
+ *   Base burn minutes = minutes of unprotected exposure at UV index 3 before
+ *   unprotected skin starts to burn, per Fitzpatrick type (I:10 II:20 III:30
+ *   IV:40 V:50 VI:60). Time scales with sunscreen (x SPF) and inversely with
+ *   UV index: minutes = base * SPF * (3 / UV).
+ */
+'use strict';
+
+var SOLSAFE_BASE_BURN = { 1: 10, 2: 20, 3: 30, 4: 40, 5: 50, 6: 60 };
+var SOLSAFE_REF_UV = 3;
+var SOLSAFE_COMMON_SPFS = [15, 30, 50, 100];
+
+function solsafeClamp(n, lo, hi) {
+  if (typeof n !== 'number' || isNaN(n)) return lo;
+  return Math.min(hi, Math.max(lo, n));
+}
+
+function solsafeToNum(n, fallback) {
+  n = parseFloat(n);
+  return isNaN(n) ? fallback : n;
+}
+
+// Normalize to a skin type 1..6; anything unknown falls back to 3 (average).
+function normalizeSkinType(t) {
+  t = Math.round(solsafeToNum(t, 3));
+  return solsafeClamp(t, 1, 6);
+}
+
+// Base unprotected burn minutes at UV 3 for a skin type.
+function baseBurnMinutes(skinType) {
+  return SOLSAFE_BASE_BURN[normalizeSkinType(skinType)];
+}
+
+// How many times faster skin burns at this UV index vs the reference UV 3.
+function uvSpeedFactor(uvIndex) {
+  uvIndex = solsafeToNum(uvIndex, 0);
+  if (uvIndex <= 0) return 0;
+  return uvIndex / SOLSAFE_REF_UV;
+}
+
+function skinTypeInfo(skinType) {
+  var t = normalizeSkinType(skinType);
+  var names = {
+    1: 'Type I — Very Fair',
+    2: 'Type II — Fair',
+    3: 'Type III — Medium',
+    4: 'Type IV — Olive',
+    5: 'Type V — Brown',
+    6: 'Type VI — Deeply Pigmented'
+  };
+  var desc = {
+    1: 'Always burns, never tans. Needs maximum protection at all times.',
+    2: 'Usually burns, tans minimally. Needs strong protection.',
+    3: 'Sometimes mild burn, then tans gradually. Needs solid protection.',
+    4: 'Rarely burns, tans easily. Still needs sunscreen for long exposure.',
+    5: 'Very rarely burns, tans dark. Needs sunscreen for long exposure.',
+    6: 'Never burns. Sunscreen still needed to prevent long-term damage.'
+  };
+  return { type: t, name: names[t], description: desc[t], baseMinutes: SOLSAFE_BASE_BURN[t] };
+}
+
+// Estimated minutes in the sun before burning: base * SPF * (3 / UV).
+// Returns Infinity when there is effectively no UV (e.g. night).
+function burnTimeMinutes(skinType, uvIndex, spf) {
+  var base = baseBurnMinutes(skinType);
+  var factor = solsafeToNum(spf, 0);
+  if (factor <= 0) factor = 1; // no sunscreen on -> no multiplication
+  var speed = uvSpeedFactor(uvIndex);
+  if (speed <= 0) return Infinity;
+  return base * factor / speed;
+}
+
+// User-friendly safe minutes (rounded down, null when effectively infinite).
+function safeMinutes(skinType, uvIndex, spf) {
+  var m = burnTimeMinutes(skinType, uvIndex, spf);
+  if (!isFinite(m)) return null;
+  return Math.floor(m);
+}
+
+// Reverse SPF finder: planned minutes in sun -> recommended SPF.
+// Returns { raw, recommended, message }.
+function recommendSpf(skinType, uvIndex, minutesPlanned) {
+  var base = baseBurnMinutes(skinType);
+  var uv = solsafeToNum(uvIndex, 0);
+  var planned = solsafeToNum(minutesPlanned, 0);
+  if (planned <= 0) {
+    return { raw: 0, recommended: 15, message: 'Enter how long you plan to stay in the sun first.' };
+  }
+  if (uv <= 0) {
+    return { raw: 0, recommended: 15, message: 'No meaningful UV right now — basic SPF 15+ is plenty.' };
+  }
+  var raw = planned * (uv / SOLSAFE_REF_UV) / base; // exact SPF factor needed
+  var withMargin = raw * 1.2; // 20% safety margin
+  var spf = SOLSAFE_COMMON_SPFS[0];
+  for (var i = 0; i < SOLSAFE_COMMON_SPFS.length; i++) {
+    if (SOLSAFE_COMMON_SPFS[i] >= withMargin) { spf = SOLSAFE_COMMON_SPFS[i]; break; }
+    spf = SOLSAFE_COMMON_SPFS[i];
+  }
+  var capped = withMargin > SOLSAFE_COMMON_SPFS[SOLSAFE_COMMON_SPFS.length - 1];
+  var message;
+  if (capped) {
+    message = 'Even SPF 100 is not enough for that long — add shade, a hat and protective clothing too.';
+  } else if (spf === 15) {
+    message = 'SPF 15 should cover you — reapply every 2 hours and after swimming or sweating.';
+  } else {
+    message = 'SPF ' + spf + ' should cover you — reapply every 2 hours and after swimming or sweating.';
+  }
+  return { raw: Math.round(raw * 10) / 10, recommended: spf, capped: capped, message: message };
+}
+
+// Reapply countdown: 25% of the protected burn time, clamped 20..120 min
+// (kids capped at 60 min per pediatric guidance).
+function reapplyIntervalMinutes(skinType, uvIndex, spf, isKid) {
+  var burn = burnTimeMinutes(skinType, uvIndex, spf);
+  var raw = burn / 4;
+  if (!isFinite(raw)) raw = 120;
+  var hi = isKid ? 60 : 120;
+  return Math.round(solsafeClamp(raw, 20, hi));
+}
+
+// Defaults for children: more sensitive skin, higher SPF, shorter reapply cadence.
+function kidDefaults() {
+  return {
+    skinType: 2,          // treat child skin like Type II for conservative math
+    spf: 50,
+    reapplyMinutes: 40,
+    shadeUv: 6,           // seek shade at UV 6+
+    note: 'Child skin is treated conservatively: assume Type II sensitivity, SPF 50+, and reapply every 40 minutes or less.'
+  };
+}
+
+// UV index band with flag color + kid-specific shade advice.
+function uvBand(uvIndex) {
+  var uv = solsafeToNum(uvIndex, 0);
+  if (uv < 3) {
+    return { level: 1, label: 'Low', color: '#16A34A', min: 0, max: 2.9,
+      advice: 'No protection needed for most adults.',
+      kidAdvice: 'Green flag: kids can play, but hats and water breaks are still smart.' };
+  }
+  if (uv < 6) {
+    return { level: 2, label: 'Moderate', color: '#D9A400', min: 3, max: 5.9,
+      advice: 'Seek shade around midday. Sunscreen recommended.',
+      kidAdvice: 'Yellow flag: shade breaks every hour; sunscreen on all exposed skin.' };
+  }
+  if (uv < 8) {
+    return { level: 3, label: 'High', color: '#EA7B1E', min: 6, max: 7.9,
+      advice: 'Protection essential. Reduce midday sun. Burns possible in under 20 min.',
+      kidAdvice: 'Orange flag: kids play in shade between 11am and 3pm; reapply sunscreen every 40 minutes.' };
+  }
+  if (uv < 11) {
+    return { level: 4, label: 'Very High', color: '#DC2626', min: 8, max: 10.9,
+      advice: 'Avoid midday sun. Unprotected skin burns fast.',
+      kidAdvice: 'Red flag: kids should stay mostly in shade; long sleeves, hat and SPF 50+.' };
+  }
+  return { level: 5, label: 'Extreme', color: '#7C3AED', min: 11, max: 99,
+    advice: 'Avoid the sun. Seek shade. Unprotected skin burns in minutes.',
+    kidAdvice: 'Purple flag: keep kids indoors or fully shaded at midday; reapply SPF 50+ every 40 minutes.' };
+}
+
+// The Fitzpatrick quiz: 5 description-based questions; each option maps to a type 1..6.
+function quizQuestions() {
+  return [
+    {
+      id: 'tone',
+      question: 'What does your untanned skin look like (check an area that never sees sun)?',
+      options: [
+        { label: 'Very pale / porcelain white', type: 1 },
+        { label: 'Fair / light beige', type: 2 },
+        { label: 'Light brown / golden', type: 3 },
+        { label: 'Olive brown', type: 4 },
+        { label: 'Dark brown', type: 5 },
+        { label: 'Deeply pigmented / near-black', type: 6 }
+      ]
+    },
+    {
+      id: 'burn',
+      question: 'After 30 minutes of midday sun with NO sunscreen, you…',
+      options: [
+        { label: 'Always burn badly — red, peeling, maybe blisters', type: 1 },
+        { label: 'Usually burn, then get a light tan', type: 2 },
+        { label: 'Sometimes get a mild burn, then tan gradually', type: 3 },
+        { label: 'Rarely burn, tan easily', type: 4 },
+        { label: 'Very rarely burn, tan dark', type: 5 },
+        { label: 'Never burn', type: 6 }
+      ]
+    },
+    {
+      id: 'hair',
+      question: 'Your natural hair and eye color?',
+      options: [
+        { label: 'Red or strawberry-blond hair, blue/green/grey eyes', type: 1 },
+        { label: 'Blond or light-brown hair, light eyes', type: 2 },
+        { label: 'Brown hair, brown or hazel eyes', type: 3 },
+        { label: 'Dark-brown hair, brown eyes', type: 4 },
+        { label: 'Dark-brown or black hair, dark eyes', type: 5 },
+        { label: 'Black hair, dark-brown eyes', type: 6 }
+      ]
+    },
+    {
+      id: 'freckles',
+      question: 'How do freckles appear on you?',
+      options: [
+        { label: 'Lots of freckles, all year round', type: 1 },
+        { label: 'Freckles show up every summer', type: 2 },
+        { label: 'A few freckles here and there', type: 3 },
+        { label: 'Rarely any freckles', type: 4 },
+        { label: 'Very rarely any freckles', type: 5 },
+        { label: 'Never any freckles', type: 6 }
+      ]
+    },
+    {
+      id: 'history',
+      question: 'The worst your skin has ever done in strong sun?',
+      options: [
+        { label: 'Severe blistering sunburn', type: 1 },
+        { label: 'Painful red burn', type: 2 },
+        { label: 'Mild burn that turned brown', type: 3 },
+        { label: 'Browned quickly, rarely burned', type: 4 },
+        { label: 'Darkened fast, almost never burned', type: 5 },
+        { label: 'Pigmented deeply, never burned', type: 6 }
+      ]
+    }
+  ];
+}
+
+// answers: array of chosen type numbers (1..6). Returns { average, skinType, info }.
+function quizScore(answers) {
+  if (!answers || !answers.length) {
+    return { average: 0, skinType: 3, info: skinTypeInfo(3), answered: 0 };
+  }
+  var sum = 0, n = 0;
+  for (var i = 0; i < answers.length; i++) {
+    var v = solsafeToNum(answers[i], 0);
+    if (v >= 1 && v <= 6) { sum += v; n++; }
+  }
+  if (n === 0) return { average: 0, skinType: 3, info: skinTypeInfo(3), answered: 0 };
+  var avg = sum / n;
+  var t = normalizeSkinType(avg);
+  return { average: Math.round(avg * 100) / 100, skinType: t, info: skinTypeInfo(t), answered: n };
+}
+
+// mm:ss / h:mm:ss display for the countdown.
+function formatCountdown(totalSeconds) {
+  totalSeconds = Math.max(0, Math.round(solsafeToNum(totalSeconds, 0)));
+  var h = Math.floor(totalSeconds / 3600);
+  var m = Math.floor((totalSeconds % 3600) / 60);
+  var s = totalSeconds % 60;
+  var mm = (h > 0 && m < 10 ? '0' : '') + m;
+  var ss = (s < 10 ? '0' : '') + s;
+  return h > 0 ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+}
+
+// Fraction (0..1) of the timer elapsed — pure helper for progress bars.
+function timerProgress(remaining, total) {
+  total = solsafeToNum(total, 0);
+  remaining = solsafeToNum(remaining, 0);
+  if (total <= 0) return 0;
+  return solsafeClamp(1 - remaining / total, 0, 1);
+}
+
+</script>
+
+<!-- ============ UI WIRING ============ -->
+<script>
+(function () {
+  'use strict';
+
+  var PROFILE_KEY = 'solsafe-profile-v1';
+  var state = { skinType: 3, kidsMode: false, quizAnswers: [] };
+
+  function loadProfile() {
+    try {
+      var raw = localStorage.getItem(PROFILE_KEY);
+      if (raw) {
+        var p = JSON.parse(raw);
+        if (p && p.skinType >= 1 && p.skinType <= 6) state.skinType = p.skinType;
+        if (p && typeof p.kidsMode === 'boolean') state.kidsMode = p.kidsMode;
+      }
+    } catch (e) { /* storage unavailable — defaults stand */ }
+  }
+  function saveProfile() {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ skinType: state.skinType, kidsMode: state.kidsMode })); }
+    catch (e) { /* ignore */ }
+  }
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ---------- pennant divider ---------- */
+  (function () {
+    var box = $('pennants');
+    var colors = ['', 'teal', 'cream'];
+    for (var i = 0; i < 24; i++) {
+      var d = document.createElement('div');
+      d.className = 'pennant ' + colors[i % 3];
+      box.appendChild(d);
+    }
+  })();
+
+  /* ---------- Booth 1: quiz ---------- */
+  var QUESTIONS = quizQuestions();
+  var quizIdx = 0;
+
+  function renderTiles() {
+    var box = $('type-tiles');
+    box.innerHTML = '';
+    for (var t = 1; t <= 6; t++) {
+      (function (type) {
+        var info = skinTypeInfo(type);
+        var b = document.createElement('button');
+        b.className = 'type-tile p-2.5 text-center' + (state.skinType === type ? ' selected' : '');
+        b.innerHTML = '<span class="font-display font-bold block">Type ' + ['I','II','III','IV','V','VI'][type - 1] + '</span>' +
+          '<span class="block w-8 h-8 rounded-full mx-auto my-1.5 border-2 border-[#4E321B]" style="background:' +
+          ['#FDE8D8','#F5D3AE','#E0AC69','#C68642','#8D5524','#3B2314'][type - 1] + '"></span>' +
+          '<span class="text-xs font-bold text-[#6B5B4F] block">' + esc(info.name.split(' — ')[1]) + '</span>';
+        b.addEventListener('click', function () { setSkinType(type); });
+        box.appendChild(b);
+      })(t);
+    }
+  }
+
+  function setSkinType(t) {
+    state.skinType = normalizeSkinType(t);
+    saveProfile();
+    renderTiles();
+    syncCalcSkin();
+    updateCalc();
+  }
+
+  function startQuiz() {
+    quizIdx = 0; state.quizAnswers = [];
+    $('quiz-start').classList.add('hidden');
+    $('quiz-result').classList.add('hidden');
+    $('quiz-body').classList.remove('hidden');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    var q = QUESTIONS[quizIdx];
+    $('quiz-count').textContent = 'Question ' + (quizIdx + 1) + ' of ' + QUESTIONS.length;
+    $('quiz-q').textContent = q.question;
+    var dots = $('quiz-dots'); dots.innerHTML = '';
+    for (var i = 0; i < QUESTIONS.length; i++) {
+      var d = document.createElement('span');
+      d.className = 'w-3 h-3 rounded-full ' + (i < quizIdx ? 'bg-[#00A8B5]' : (i === quizIdx ? 'bg-[#FF8C42]' : 'bg-[#E8DCC3]'));
+      dots.appendChild(d);
+    }
+    var box = $('quiz-opts'); box.innerHTML = '';
+    q.options.forEach(function (opt) {
+      var b = document.createElement('button');
+      b.className = 'quiz-opt w-full text-left px-4 py-3 font-semibold';
+      b.textContent = opt.label;
+      b.addEventListener('click', function () {
+        state.quizAnswers[quizIdx] = opt.type;
+        if (quizIdx < QUESTIONS.length - 1) { quizIdx++; renderQuestion(); }
+        else { showQuizResult(); }
+      });
+      box.appendChild(b);
+    });
+    $('quiz-back').style.visibility = quizIdx === 0 ? 'hidden' : 'visible';
+  }
+
+  function showQuizResult() {
+    var r = quizScore(state.quizAnswers);
+    $('quiz-body').classList.add('hidden');
+    $('quiz-result').classList.remove('hidden');
+    $('quiz-result-name').textContent = r.info.name;
+    $('quiz-result-desc').textContent = r.info.description;
+    $('quiz-result-base').textContent = 'Burns in ≈ ' + r.info.baseMinutes + ' min unprotected at UV 3.';
+    $('quiz-use').onclick = function () {
+      setSkinType(r.skinType);
+      $('quiz-result').classList.add('hidden');
+      $('quiz-start').classList.remove('hidden');
+    };
+    $('quiz-retake').onclick = startQuiz;
+  }
+
+  $('quiz-begin').addEventListener('click', startQuiz);
+  $('quiz-restart').addEventListener('click', startQuiz);
+  $('quiz-back').addEventListener('click', function () { if (quizIdx > 0) { quizIdx--; renderQuestion(); } });
+
+  /* ---------- Booth 2: calculator ---------- */
+  function currentUv() { return parseFloat($('calc-uv').value) || 0; }
+  function currentSpf() { return state.kidsMode ? Math.max(50, parseInt($('calc-spf').value, 10) || 0) : (parseInt($('calc-spf').value, 10) || 0); }
+
+  function syncCalcSkin() {
+    $('calc-skin').value = state.skinType;
+    var info = skinTypeInfo(state.skinType);
+    $('calc-skin-label').textContent = info.name;
+    $('spf-skin-label').textContent = info.name;
+  }
+
+  function updateCalc() {
+    var uv = currentUv(), spf = currentSpf();
+    $('calc-uv-val').textContent = uv;
+    $('calc-spf-val').textContent = spf;
+    $('spf-uv-label').textContent = uv;
+
+    var mins = safeMinutes(state.skinType, uv, spf);
+    if (mins === null) {
+      $('calc-minutes').textContent = '∞';
+      $('calc-sub').textContent = 'No meaningful UV right now — enjoy the night!';
+    } else {
+      $('calc-minutes').textContent = mins > 999 ? '999+' : mins;
+      $('calc-sub').textContent = spf > 0
+        ? 'of protection with SPF ' + spf + ' on ' + skinTypeInfo(state.skinType).name.split(' — ')[0] + ' skin'
+        : 'unprotected — sunscreen strongly recommended';
+    }
+    $('calc-reapply').textContent = reapplyIntervalMinutes(state.skinType, uv, spf, state.kidsMode);
+
+    var band = uvBand(uv);
+    var flag = $('uv-flag');
+    flag.style.borderLeftColor = band.color;
+    $('uv-flag-label').textContent = '🚩 UV ' + uv + ' —';
+    var chip = $('uv-flag-band');
+    chip.textContent = band.label.toUpperCase();
+    chip.style.background = band.color;
+    $('uv-flag-advice').textContent = state.kidsMode ? band.kidAdvice : band.advice;
+
+    var ka = $('kids-alert');
+    if (state.kidsMode) {
+      ka.classList.remove('hidden');
+      $('kids-alert-text').textContent = band.kidAdvice + ' ' + kidDefaults().note;
+    } else {
+      ka.classList.add('hidden');
+    }
+  }
+
+  ['calc-skin', 'calc-uv', 'calc-spf'].forEach(function (id) {
+    $(id).addEventListener('input', function () {
+      if (id === 'calc-skin') { state.skinType = normalizeSkinType(parseInt($('calc-skin').value, 10)); saveProfile(); renderTiles(); syncCalcSkin(); }
+      updateCalc();
+    });
+  });
+
+  $('kids-toggle').addEventListener('change', function () {
+    state.kidsMode = $('kids-toggle').checked;
+    $('kids-dot').style.transform = state.kidsMode ? 'translateX(20px)' : 'translateX(0)';
+    if (state.kidsMode) {
+      var kd = kidDefaults();
+      state.skinType = kd.skinType;
+      $('calc-spf').value = kd.spf;
+      syncCalcSkin(); renderTiles();
+    }
+    saveProfile();
+    updateCalc();
+  });
+
+  $('calc-to-timer').addEventListener('click', function () {
+    var iv = reapplyIntervalMinutes(state.skinType, currentUv(), currentSpf(), state.kidsMode);
+    setTimerMinutes(iv);
+    document.getElementById('timer-digits').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  /* ---------- Booth 3: reverse SPF finder ---------- */
+  $('spf-find').addEventListener('click', function () {
+    var planned = parseFloat($('spf-planned').value);
+    var err = $('spf-error'), res = $('spf-result');
+    if (!(planned > 0)) {
+      err.textContent = 'Please enter how many minutes you plan to stay in the sun (1–720).';
+      err.classList.remove('hidden');
+      res.classList.add('hidden');
+      return;
+    }
+    err.classList.add('hidden');
+    var r = recommendSpf(state.skinType, currentUv(), planned);
+    $('spf-rec').textContent = r.recommended;
+    $('spf-msg').textContent = r.message + ' (exact factor needed: ≈' + r.raw + '×)';
+    res.classList.remove('hidden');
+  });
+
+  /* ---------- Booth 4: live reapply timer ---------- */
+  var timer = { total: 45 * 60, remaining: 45 * 60, id: null };
+
+  function setTimerMinutes(mins) {
+    stopTick();
+    timer.total = Math.max(1, Math.round(mins)) * 60;
+    timer.remaining = timer.total;
+    $('timer-expired-banner').classList.add('hidden');
+    paintTimer();
+    $('timer-status').textContent = 'Ready — ' + Math.round(mins) + ' min set. Press Start.';
+    setTimerButtons(false);
+  }
+
+  function paintTimer() {
+    $('timer-digits').textContent = formatCountdown(timer.remaining);
+    var pct = timerProgress(timer.remaining, timer.total) * 100;
+    $('timer-bar').style.width = pct + '%';
+    $('timer-digits').style.color = timer.remaining <= 60 && timer.id ? '#DC2626' : '#3B2F2F';
+  }
+
+  function setTimerButtons(running) {
+    $('timer-start').disabled = running;
+    $('timer-pause').disabled = !running;
+    $('timer-start').style.opacity = running ? '.5' : '1';
+    $('timer-pause').style.opacity = running ? '1' : '.5';
+  }
+
+  function stopTick() { if (timer.id) { clearInterval(timer.id); timer.id = null; } }
+
+  function tick() {
+    timer.remaining--;
+    if (timer.remaining <= 0) { timer.remaining = 0; expireTimer(); return; }
+    paintTimer();
+  }
+
+  function beepAlert() {
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      var ctx = new Ctx();
+      [0, 0.35, 0.7, 1.05].forEach(function (delay) {
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = 880;
+        g.gain.setValueAtTime(0.001, ctx.currentTime + delay);
+        g.gain.exponentialRampToValueAtTime(0.5, ctx.currentTime + delay + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(ctx.currentTime + delay); o.stop(ctx.currentTime + delay + 0.32);
+      });
+    } catch (e) { /* audio unavailable */ }
+  }
+
+  function expireTimer() {
+    stopTick();
+    paintTimer();
+    setTimerButtons(false);
+    $('timer-expired-banner').classList.remove('hidden');
+    $('timer-status').textContent = "Time's up! Reapply sunscreen, then press Reset to start a fresh countdown.";
+    beepAlert();
+    try { if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]); } catch (e) {}
+    $('timer-expired-banner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.querySelectorAll('.timer-preset').forEach(function (b) {
+    b.addEventListener('click', function () { setTimerMinutes(parseInt(b.getAttribute('data-timer-min'), 10)); });
+  });
+  $('timer-custom').addEventListener('change', function () {
+    var v = parseInt($('timer-custom').value, 10);
+    if (v > 0 && v <= 480) setTimerMinutes(v);
+  });
+
+  $('timer-start').addEventListener('click', function () {
+    if (timer.id || timer.remaining <= 0) return;
+    $('timer-expired-banner').classList.add('hidden');
+    timer.id = setInterval(tick, 1000);
+    setTimerButtons(true);
+    $('timer-status').textContent = 'Counting down… SolSafe will alert you when it is time to reapply.';
+  });
+  $('timer-pause').addEventListener('click', function () {
+    stopTick(); setTimerButtons(false);
+    $('timer-status').textContent = 'Paused at ' + formatCountdown(timer.remaining) + '. Press Start to resume.';
+  });
+  $('timer-reset').addEventListener('click', function () {
+    setTimerMinutes(timer.total / 60);
+  });
+  $('timer-swim').addEventListener('click', function () {
+    var iv = reapplyIntervalMinutes(state.skinType, currentUv(), currentSpf(), state.kidsMode);
+    setTimerMinutes(iv);
+    $('timer-status').textContent = 'Fresh protection clock after swimming/sweating — ' + iv + ' min set. Press Start.';
+    $('timer-start').click();
+  });
+
+  /* ---------- init ---------- */
+  loadProfile();
+  renderTiles();
+  syncCalcSkin();
+  $('kids-toggle').checked = state.kidsMode;
+  if (state.kidsMode) {
+    $('kids-dot').style.transform = 'translateX(20px)';
+    $('calc-spf').value = kidDefaults().spf;
+  }
+  updateCalc();
+  setTimerMinutes(reapplyIntervalMinutes(state.skinType, currentUv(), currentSpf(), state.kidsMode));
+})();
+</script>
+</body>
+</html>
